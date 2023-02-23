@@ -1,0 +1,6 @@
+.env
+.secrets
+certbot
+
+etc/letsencrypt/**/*
+!etc/letsencrypt/.gitkeep
