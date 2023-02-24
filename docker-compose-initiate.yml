@@ -1,25 +1,28 @@
 version: "3"
 services:
-  nginx-temp-server.fls.red:
-    container_name: nginx-temp-server.fls.red
+  nginx-temp:
+    container_name: nginx-temp
     image: nginx:alpine
-    environment:
-      - DOMAIN
+    env_file:
+      - .env
     ports:
       - 80:80
     volumes:
       - ./etc/nginx/templates-initiate:/etc/nginx/templates
       - ./etc/letsencrypt:/etc/letsencrypt
       - ./certbot/data:/var/www/certbot
-  certbot-temp-server.fls.red:
-    container_name: certbot-temp-server.fls.red
-    image: certbot/certbot:latest
+  certbot-temp:
+    container_name: certbot-temp
+    image: certbot/dns-cloudflare
     depends_on:
-      - nginx-temp-server.fls.red
+      - nginx-temp
     command: >- 
-      certonly --reinstall --webroot --webroot-path=/var/www/certbot
+      certonly --reinstall --non-interactive
+      --dns-cloudflare --dns-cloudflare-credentials /etc/cloudflare/.secrets
+      --preferred-challenges dns-01
       --email ${EMAIL} --agree-tos --no-eff-email
-      -d ${DOMAIN}
+      -d ${DOMAIN},*.${DOMAIN}
     volumes:
+      - ./etc/cloudflare:/etc/cloudflare
       - ./etc/letsencrypt:/etc/letsencrypt
       - ./certbot/data:/var/www/certbot

@@ -1,33 +1,11 @@
 version: "3"
 services:
-  app-beatbump:
-    build:
-      context: ./Beatbump/app
-      dockerfile: Dockerfile
-      args:
-        - PORT=13000
-    expose:
-      - 13000
-    environment:
-      PORT: 13000
-      VITE_DOMAIN: "server.fls.red"
-      VITE_SITE_URL: "https://server.fls.red"
-      VITE_DONATION_URL: "https://server.fls.red"
-    restart: unless-stopped
-  proxy-beatbump:
-    build:
-      context: ./Beatbump/packages/proxy-server/deno
-      dockerfile: Dockerfile
-    ports:
-      - 13001:13001
-  nginx-server.fls.red:
-    container_name: nginx-server.fls.red
+  nginx:
+    container_name: nginx
     image: nginx:alpine
     restart: unless-stopped
-    depends_on:
-      - app-beatbump
-    environment:
-      - DOMAIN
+    env_file:
+      - .env
     ports:
       - 80:80
       - 443:443
@@ -35,15 +13,24 @@ services:
       - ./etc/nginx/templates:/etc/nginx/templates:ro
       - ./etc/letsencrypt:/etc/letsencrypt:ro
       - ./certbot/data:/var/www/certbot
-  certbot-server.fls.red:
-    container_name: certbot-server.fls.red
-    image: certbot/certbot:latest
+    networks:
+      - nginx-net
+  certbot:
+    container_name: certbot
+    image: certbot/dns-cloudflare
     depends_on:
-      - nginx-server.fls.red
+      - nginx
     command: >-
-      certonly --reinstall --webroot --webroot-path=/var/www/certbot
+      certonly --reinstall --non-interactive
+      --dns-cloudflare --dns-cloudflare-credentials /etc/cloudflare/.secrets
       --email ${EMAIL} --agree-tos --no-eff-email
-      -d ${DOMAIN}
+      --preferred-challenges dns-01
+      -d ${DOMAIN},*.${DOMAIN}
     volumes:
+      - ./etc/cloudflare:/etc/cloudflare
       - ./etc/letsencrypt:/etc/letsencrypt
       - ./certbot/data:/var/www/certbot
+
+networks:
+  nginx-net:
+    external: true

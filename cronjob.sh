@@ -9,5 +9,5 @@ else
 fi
  
 # renew certbot certificate
-docker compose -f /home/tigaron/docker/server.fls.red/docker-compose.yml run --rm certbot-server.fls.red
-docker compose -f /home/tigaron/docker/server.fls.red/docker-compose.yml exec nginx-server.fls.red nginx -s reload
+docker compose -f /home/tigaron/docker/server.fls.red/docker-compose.yml run --rm certbot
+docker compose -f /home/tigaron/docker/server.fls.red/docker-compose.yml exec nginx nginx -s reload

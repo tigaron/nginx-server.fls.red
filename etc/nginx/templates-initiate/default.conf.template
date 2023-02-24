@@ -1,7 +1,27 @@
 server {
     listen [::]:80;
     listen 80;
-    server_name $DOMAIN;
+    server_name $PUPFLARE_DOMAIN;
+    location ~/.well-known/acme-challenge {
+      allow all;
+      root /var/www/certbot;
+    }
+}
+
+server {
+    listen [::]:80;
+    listen 80;
+    server_name $BEATBUMP_APP_DOMAIN;
+    location ~/.well-known/acme-challenge {
+      allow all;
+      root /var/www/certbot;
+    }
+}
+
+server {
+    listen [::]:80;
+    listen 80;
+    server_name $BEATBUMP_PROXY_DOMAIN;
     location ~/.well-known/acme-challenge {
       allow all;
       root /var/www/certbot;

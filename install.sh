@@ -1,14 +1,7 @@
 #!/bin/bash
-# takes two paramters, the domain name and the email to be associated with the certificate
-DOMAIN="server.fls.red"
-EMAIL="suputra@mail.com"
-
-echo DOMAIN=${DOMAIN} >> .env
-echo EMAIL=${EMAIL} >> .env
-
 # Phase 1
-docker compose -f ./docker-compose-initiate.yml up -d nginx-temp-server.fls.red
-docker compose -f ./docker-compose-initiate.yml up certbot-temp-server.fls.red
+docker compose -f ./docker-compose-initiate.yml up -d nginx-temp
+docker compose -f ./docker-compose-initiate.yml up certbot-temp
 docker compose -f ./docker-compose-initiate.yml down
  
 # some configurations for let's encrypt
